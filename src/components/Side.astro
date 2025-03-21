@@ -1,0 +1,36 @@
+---
+import SectionNav from "./SectionNav.astro";
+import ItemRRSS from "./ItemRRSS.astro";
+import AstroBoyImg from "../icons/AstroBoyImg.astro";
+import GithubIcon from "../icons/GithubIcon.astro";
+import LinkedinIcon from "../icons/LinkedinIcon.astro";
+---
+
+<nav class="flex flex-col flex-1 items-center justify-center">
+    <div class="gap-20 flex flex-col">
+        <div class="flex flex-col gap-3">
+            <picture>
+                <img src="/img/Perfil.webp" alt="Julio Monroy" class="rounded-full w-20 h-20 object-cover"/ >
+            </picture>
+            <div>
+                <h1>Julio Monroy</h1>
+                <span class="text-xs text-slate-500">
+                    Programador Analitico
+                </span>
+            </div>
+        </div>
+        <ul class="flex flex-col justify-center gap-2">
+            <SectionNav href="/#projects" title="Projectos" />
+            <SectionNav href="/#experience" title="Experiencia" />
+            <SectionNav href="/#about" title="Sobre mi" />
+        </ul>
+        <div class="flex content-between w-50 gap-5">
+            <ItemRRSS href="https://github.com/Elcazuelas">
+                <GithubIcon />
+            </ItemRRSS>
+            <ItemRRSS href="https://linkedin.com/in/julio-monroy">
+                <LinkedinIcon />
+        </div>
+    </div>
+</nav>
+

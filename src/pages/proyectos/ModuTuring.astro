@@ -1,0 +1,21 @@
+---
+import Layout from "../../layouts/Layout.astro";
+const { name } = Astro.params;
+---
+
+<Layout>
+    <span class="text-white text-3xl font-semibold">
+        ModuTuring
+    </span>
+    <p class="text-base font-normal text-gray-500 dark:text-gray-400"> Es un simulador de Máquinas de Turing con notación modular. 
+        este proyecto me permitió graduarme de Ingeniería Civil en Informática, está diseñado para que los alumnos de la 
+        Universidad del Bío-Bío lo ocupen en clases de Fundamentos de la Computación.
+        <br>
+        <br>
+        Actualmentete este proyecto se encuentra en fase de despliegue debido a que un requisito es que se implemente 
+        dentro de un servidor privado de la Universidad.
+    </p>
+    <picture class="pb-30">
+        <img src="/img/SimMTD.webp" alt="Modular Turing Machine Simulator" class="h-auto w-full rounded-md object-cover" />
+    </picture>
+</Layout>

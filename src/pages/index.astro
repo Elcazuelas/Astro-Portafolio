@@ -1,0 +1,35 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ProyectCard from "../components/ProyectCard.astro";
+import TituloSection from "../components/TituloSection.astro";
+import TimeLine from "../components/TimeLine.astro";
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<Layout>
+	<section id="projects" class="flex flex-col">
+		<TituloSection> Proyectos </TituloSection>
+		<ProyectCard />
+	</section>
+	<section id="experience" class="flex flex-col">
+		<TituloSection> Experiencia </TituloSection>
+		<TimeLine />
+	</section>
+	<section id="about" class="flex flex-col mb-25">
+		<TituloSection> Sobre mi </TituloSection>
+		<p class="text-base font-semibold text-gray-900 dark:text-white">
+			Hola! me llamo Julio Monroy 👋🏼
+		</p>
+		<p class="text-base font-normal text-gray-500 dark:text-gray-400">
+			Me gusta programar, y practicar deportes.
+			Soy Ingeniero Civil en Informática, mis objetivos son mejorar en la programación y
+			aportar con mi capacidad para resolver problemas en un equipo.
+			También me gusta aprender sobre patrones de diseño de software, robótica y tecnología en general. 💻
+
+		</p>
+	</section>
+	<!-- <section id="contact" class="flex flex-col mb-20">
+		<TituloSection> Contacto </TituloSection>
+	</section> -->
+</Layout>

@@ -1,0 +1,36 @@
+---
+import TimeLineItem from "./TimeLineItem.astro";
+type Experience = {
+    date: string;
+    title: string;
+    description: string;
+}
+const experience: Experience[] = [
+    {
+        date: "agosto 2022 – diciembre 2024",
+        title: "Ayudante a la enseñanza en laboratorios Centrales de Computación en Universidad del Bío-Bío",
+        description: `Se realizan actividades de mantención y gestión de equipos computacionales dentro de los laboratorios de computación, además de atender las necesidades de la comunidad universitaria.`,
+    },
+    {
+        date: "septiembre 2024 – diciembre2024",
+        title: "Ayudante Sistemas Operativos en Universidad del Bío-Bío",
+        description: `Bajo la coordinación del docente ayudé a la revisión de tareas y trabajos de la asignatura.`,
+    },
+    {
+        date: "marzo 2023 – julio 2024",
+        title: "Ayudante Fundamentos para Ciencias de la Computación en Universidad del Bío-Bío",
+        description:`Realicé ayudantías a estudiantes, brindando las oportunidades para desarrollar lo aprendido en clases y resolver dudas. También ayudé a revisar actividades y tareas de la asignatura.`,
+    },
+    {
+        date: "noviembre 2023 – diciembre 2023",
+        title: "Desarrollador en Unidad de Desarrollo Universidad del Bío-Bío",
+        description:`Aporté como desarrollador en un equipo, específicamente en la creación de un módulo para la intranet de la Universidad del Bío-Bío, donde trabajé con la librería mxGraph en JavaScript y PHP para lógica de negocio.`,
+    }
+];
+---
+<ol class="relative border-s border-gray-200 dark:border-gray-700">                  
+    {experience.map((experience) => (
+        <TimeLineItem date={experience.date} title={experience.title} description={experience.description} />
+    ))}
+</ol>
+

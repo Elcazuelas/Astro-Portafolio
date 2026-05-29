@@ -84,55 +84,58 @@ import { ClientRouter } from "astro:transitions";
 </html>
 
 <script>
-	const asideTarget = document.querySelector(
-		"#aside-target",
-	) as HTMLButtonElement;
-	const aside = document.querySelector("#aside") as HTMLElement;
-	const main = document.querySelector("#main") as HTMLElement;
-	const closeAside = document.querySelector(
-		"#close-aside",
-	) as HTMLButtonElement;
+	const asideTarget = document.querySelector("#aside-target");
+	const aside = document.querySelector("#aside");
+	const main = document.querySelector("#main");
+	const closeAside = document.querySelector("#close-aside");
 
-	// Función para alternar el estado del aside
-	const toggleAside = () => {
-		aside.classList.toggle("hidden");
-		aside.classList.toggle("flex");
-		main.classList.toggle("blur-sm");
-	};
+	if (
+		asideTarget instanceof HTMLElement &&
+		aside instanceof HTMLElement &&
+		main instanceof HTMLElement &&
+		closeAside instanceof HTMLElement
+	) {
+		// Función para alternar el estado del aside
+		const toggleAside = () => {
+			aside.classList.toggle("hidden");
+			aside.classList.toggle("flex");
+			main.classList.toggle("blur-sm");
+		};
 
-	// Al hacer clic en el botón de apertura del aside
-	asideTarget.addEventListener("click", (event) => {
-		event.stopPropagation(); // Evitar que el clic se propague al documento
-		toggleAside();
-	});
+		// Al hacer clic en el botón de apertura del aside
+		asideTarget.addEventListener("click", (event) => {
+			event.stopPropagation(); // Evitar que el clic se propague al documento
+			toggleAside();
+		});
 
-	// Al hacer clic en el botón de cierre del aside
-	closeAside.addEventListener("click", (event) => {
-		event.stopPropagation(); // Evitar que el clic se propague al documento
-		toggleAside();
-	});
+		// Al hacer clic en el botón de cierre del aside
+		closeAside.addEventListener("click", (event) => {
+			event.stopPropagation(); // Evitar que el clic se propague al documento
+			toggleAside();
+		});
 
-	// Cerrar el aside si se hace clic fuera de él
-	document.addEventListener("click", (event) => {
-		// Verificar si el clic ocurrió fuera del aside y el botón de apertura
-		if (!event.target) return;
-		if (
-			!aside.contains(event.target as Node) &&
-			!asideTarget.contains(event.target as Node)
-		) {
-			// Si está abierto, cerrar el aside
-			if (!aside.classList.contains("hidden")) {
+		// Cerrar el aside si se hace clic fuera de él
+		document.addEventListener("click", (event) => {
+			// Verificar si el clic ocurrió fuera del aside y el botón de apertura
+			if (!event.target) return;
+			if (
+				!aside.contains(event.target as Node) &&
+				!asideTarget.contains(event.target as Node)
+			) {
+				// Si está abierto, cerrar el aside
+				if (!aside.classList.contains("hidden")) {
+					toggleAside();
+				}
+			}
+		});
+
+		aside.addEventListener("click", (event) => {
+			if (window.innerWidth > 640) return;
+			if ((event.target as HTMLElement).tagName.toLowerCase() === "a") {
 				toggleAside();
 			}
-		}
-	});
-
-	aside?.addEventListener("click", (event) => {
-		if(window.innerWidth > 640) return
-		if ((event.target as HTMLElement).tagName.toLowerCase() === "a") {
-			toggleAside();
-		}
-	});
+		});
+	}
 </script>
 
 <style>

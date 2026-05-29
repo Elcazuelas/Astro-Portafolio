@@ -5,6 +5,10 @@ export interface Props {
 }
 const { href, title } = Astro.props;
 ---
-<a  href={href} class="nav-link text-slate-300 hover:text-slate-50 hover:scale-105 truncate transition-all duration-100">
+<a
+    href={href}
+    data-active="false"
+    class="nav-link relative ps-3 border-l-2 border-transparent text-slate-200 text-lg sm:text-xl font-semibold tracking-wide hover:text-white hover:scale-105 truncate transition-all duration-150 data-[active=true]:text-white data-[active=true]:border-sky-300 data-[active=true]:translate-x-1"
+>
     {title}
-</a>   
+</a>

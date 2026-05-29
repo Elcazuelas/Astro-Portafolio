@@ -42,7 +42,7 @@ import { ClientRouter } from "astro:transitions";
 		<div class="flex ps-2">
 			<aside
 				id="aside"
-				class="sticky top-0 lg:left-30 z-40 w-64 transition-all duration-200 h-screen sm:flex flex-col hidden"
+				class="fixed sm:sticky top-0 left-0 lg:left-30 z-40 w-64 transition-all duration-200 h-screen sm:flex flex-col hidden bg-linear-to-b bg-fixed from-slate-700 to-slate-950 sm:bg-none"
 			>
 				<button
 					id="close-aside"
@@ -66,6 +66,12 @@ import { ClientRouter } from "astro:transitions";
 				</button>
 				<Side />
 			</aside>
+			<button
+				id="menu-backdrop"
+				type="button"
+				aria-label="Cerrar menú"
+				class="fixed inset-0 z-30 hidden bg-slate-950/20 sm:hidden"
+			></button>
 			<main
 				id="main"
 				class="flex-1 pe-2 lg:ms-94 sm:ms-64 lg:me-30 sm:mt-25 mt-10 transition-all duration-200"
@@ -84,6 +90,7 @@ import { ClientRouter } from "astro:transitions";
 
 <script>
 	const MOBILE_BREAKPOINT = 640;
+	const ACTIVE_SECTION_OFFSET = 96;
 
 	const initSectionNavHighlight = () => {
 		const navLinks = Array.from(document.querySelectorAll(".nav-link"));
@@ -109,6 +116,8 @@ import { ClientRouter } from "astro:transitions";
 			if (section) sectionsByHash.set(link.hash, section);
 		});
 
+		const sectionEntries = Array.from(sectionsByHash.entries());
+
 		const setActiveHash = (activeHash: string) => {
 			navLinks.forEach((link) => {
 				if (!(link instanceof HTMLAnchorElement)) return;
@@ -123,6 +132,18 @@ import { ClientRouter } from "astro:transitions";
 			});
 		};
 
+		const getActiveHashFromScroll = () => {
+			let activeHash = sectionEntries[0]?.[0] || "";
+
+			sectionEntries.forEach(([hash, section]) => {
+				if (section.getBoundingClientRect().top <= ACTIVE_SECTION_OFFSET) {
+					activeHash = hash;
+				}
+			});
+
+			return activeHash;
+		};
+
 		const initialHash = window.location.hash || "#projects";
 		setActiveHash(initialHash);
 
@@ -133,41 +154,16 @@ import { ClientRouter } from "astro:transitions";
 			return;
 		}
 
-		const visibleRatios = new Map<string, number>();
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					const hash = `#${entry.target.id}`;
-					if (entry.isIntersecting) {
-						visibleRatios.set(hash, entry.intersectionRatio);
-						return;
-					}
-					visibleRatios.delete(hash);
-				});
-
-				if (!visibleRatios.size) return;
-
-				let selectedHash = "";
-				let selectedRatio = -1;
-
-				visibleRatios.forEach((ratio, hash) => {
-					if (ratio > selectedRatio) {
-						selectedHash = hash;
-						selectedRatio = ratio;
-					}
-				});
-
-				if (selectedHash) setActiveHash(selectedHash);
-			},
-			{
-				root: null,
-				threshold: [0.2, 0.35, 0.5, 0.7],
-				rootMargin: "-15% 0px -55% 0px",
-			}
-		);
-
-		sectionsByHash.forEach((section) => observer.observe(section));
+		let ticking = false;
+		const scheduleActiveUpdate = () => {
+			if (ticking) return;
+			ticking = true;
+			window.requestAnimationFrame(() => {
+				ticking = false;
+				const activeHash = getActiveHashFromScroll();
+				if (activeHash) setActiveHash(activeHash);
+			});
+		};
 
 		document.addEventListener(
 			"click",
@@ -181,6 +177,26 @@ import { ClientRouter } from "astro:transitions";
 		);
 
 		window.addEventListener(
+			"scroll",
+			scheduleActiveUpdate,
+			{ signal, passive: true }
+		);
+
+		document.addEventListener(
+			"scroll",
+			scheduleActiveUpdate,
+			{ signal, passive: true, capture: true }
+		);
+
+		window.addEventListener(
+			"resize",
+			scheduleActiveUpdate,
+			{ signal }
+		);
+
+		scheduleActiveUpdate();
+
+		window.addEventListener(
 			"hashchange",
 			() => {
 				setActiveHash(window.location.hash || "#projects");
@@ -190,7 +206,6 @@ import { ClientRouter } from "astro:transitions";
 
 		(window as Window & { __sectionNavCleanup?: () => void }).__sectionNavCleanup = () => {
 			controller.abort();
-			observer.disconnect();
 		};
 	};
 
@@ -234,12 +249,14 @@ import { ClientRouter } from "astro:transitions";
 		const aside = document.querySelector("#aside");
 		const main = document.querySelector("#main");
 		const closeAside = document.querySelector("#close-aside");
+		const menuBackdrop = document.querySelector("#menu-backdrop");
 
 		if (
 			!(asideTarget instanceof HTMLElement) ||
 			!(aside instanceof HTMLElement) ||
 			!(main instanceof HTMLElement) ||
-			!(closeAside instanceof HTMLElement)
+			!(closeAside instanceof HTMLElement) ||
+			!(menuBackdrop instanceof HTMLElement)
 		) {
 			return;
 		}
@@ -256,13 +273,17 @@ import { ClientRouter } from "astro:transitions";
 		const openAside = () => {
 			aside.classList.remove("hidden");
 			aside.classList.add("flex");
+			menuBackdrop.classList.remove("hidden");
 			main.classList.add("blur-sm");
+			main.classList.add("pointer-events-none");
 		};
 
 		const closeAsideFn = () => {
 			aside.classList.add("hidden");
 			aside.classList.remove("flex");
+			menuBackdrop.classList.add("hidden");
 			main.classList.remove("blur-sm");
+			main.classList.remove("pointer-events-none");
 		};
 
 		const toggleAside = () => {
@@ -288,6 +309,12 @@ import { ClientRouter } from "astro:transitions";
 				event.stopPropagation();
 				closeAsideFn();
 			},
+			{ signal }
+		);
+
+		menuBackdrop.addEventListener(
+			"click",
+			closeAsideFn,
 			{ signal }
 		);
 
@@ -321,7 +348,9 @@ import { ClientRouter } from "astro:transitions";
 			"resize",
 			() => {
 				if (window.innerWidth >= MOBILE_BREAKPOINT) {
+					menuBackdrop.classList.add("hidden");
 					main.classList.remove("blur-sm");
+					main.classList.remove("pointer-events-none");
 				}
 			},
 			{ signal }

@@ -22,3 +22,12 @@
 		transition: none;
 	}
 }
+
+ @media (max-width: 639px) {
+	#experience[data-reveal],
+	#experience [data-reveal] {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+}

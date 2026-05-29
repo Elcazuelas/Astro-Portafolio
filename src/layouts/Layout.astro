@@ -11,7 +11,7 @@ import { ClientRouter } from "astro:transitions";
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>CazuelasDev</title>
+		<title>Julio Monroy | Ingeniero Civil en Informática</title>
 		<ClientRouter />
 	</head>
 	<body class="bg-linear-to-b bg-fixed from-slate-700 to-slate-950">
@@ -39,11 +39,10 @@ import { ClientRouter } from "astro:transitions";
 				</svg>
 			</button>
 		</div>
-		<div class="h-screen flex ps-2">
+		<div class="flex ps-2">
 			<aside
 				id="aside"
-				class="bg-linear-to-b from-slate-700 to-slate-950
-			fixed top-0 left-0 lg:left-30 z-40 w-64 transition-all duration-200 h-screen sm:flex flex-col hidden"
+				class="sticky top-0 lg:left-30 z-40 w-64 transition-all duration-200 h-screen sm:flex flex-col hidden"
 			>
 				<button
 					id="close-aside"
@@ -73,7 +72,7 @@ import { ClientRouter } from "astro:transitions";
 			>
 				<div class="relative grid grid-cols-6 sm:grid-cols-12 gap-3">
 					<div
-						class="sm:col-span-10 sm:col-start-2 col-span-4 col-start-2 gap-20 flex flex-col"
+						class="sm:col-span-10 sm:col-start-2 col-span-4 col-start-2 flex flex-col"
 					>
 						<slot />
 					</div>
@@ -84,58 +83,261 @@ import { ClientRouter } from "astro:transitions";
 </html>
 
 <script>
-	const asideTarget = document.querySelector("#aside-target");
-	const aside = document.querySelector("#aside");
-	const main = document.querySelector("#main");
-	const closeAside = document.querySelector("#close-aside");
+	const MOBILE_BREAKPOINT = 640;
 
-	if (
-		asideTarget instanceof HTMLElement &&
-		aside instanceof HTMLElement &&
-		main instanceof HTMLElement &&
-		closeAside instanceof HTMLElement
-	) {
-		// Función para alternar el estado del aside
-		const toggleAside = () => {
-			aside.classList.toggle("hidden");
-			aside.classList.toggle("flex");
-			main.classList.toggle("blur-sm");
+	const initSectionNavHighlight = () => {
+		const navLinks = Array.from(document.querySelectorAll(".nav-link"));
+
+		if (!navLinks.length) {
+			return;
+		}
+
+		const previousCleanup = (window as Window & { __sectionNavCleanup?: () => void })
+			.__sectionNavCleanup;
+		if (previousCleanup) previousCleanup();
+
+		const controller = new AbortController();
+		const { signal } = controller;
+
+		const sectionsByHash = new Map<string, HTMLElement>();
+
+		navLinks.forEach((link) => {
+			if (!(link instanceof HTMLAnchorElement)) return;
+			const sectionId = link.hash.replace("#", "");
+			if (!sectionId) return;
+			const section = document.getElementById(sectionId);
+			if (section) sectionsByHash.set(link.hash, section);
+		});
+
+		const setActiveHash = (activeHash: string) => {
+			navLinks.forEach((link) => {
+				if (!(link instanceof HTMLAnchorElement)) return;
+				const samePath = new URL(link.href).pathname === window.location.pathname;
+				const isActive = samePath && link.hash === activeHash;
+				link.dataset.active = isActive ? "true" : "false";
+				if (isActive) {
+					link.setAttribute("aria-current", "true");
+					return;
+				}
+				link.removeAttribute("aria-current");
+			});
 		};
 
-		// Al hacer clic en el botón de apertura del aside
-		asideTarget.addEventListener("click", (event) => {
-			event.stopPropagation(); // Evitar que el clic se propague al documento
-			toggleAside();
-		});
+		const initialHash = window.location.hash || "#projects";
+		setActiveHash(initialHash);
 
-		// Al hacer clic en el botón de cierre del aside
-		closeAside.addEventListener("click", (event) => {
-			event.stopPropagation(); // Evitar que el clic se propague al documento
-			toggleAside();
-		});
+		if (!sectionsByHash.size) {
+			(window as Window & { __sectionNavCleanup?: () => void }).__sectionNavCleanup = () => {
+				controller.abort();
+			};
+			return;
+		}
 
-		// Cerrar el aside si se hace clic fuera de él
-		document.addEventListener("click", (event) => {
-			// Verificar si el clic ocurrió fuera del aside y el botón de apertura
-			if (!event.target) return;
-			if (
-				!aside.contains(event.target as Node) &&
-				!asideTarget.contains(event.target as Node)
-			) {
-				// Si está abierto, cerrar el aside
-				if (!aside.classList.contains("hidden")) {
-					toggleAside();
-				}
+		const visibleRatios = new Map<string, number>();
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					const hash = `#${entry.target.id}`;
+					if (entry.isIntersecting) {
+						visibleRatios.set(hash, entry.intersectionRatio);
+						return;
+					}
+					visibleRatios.delete(hash);
+				});
+
+				if (!visibleRatios.size) return;
+
+				let selectedHash = "";
+				let selectedRatio = -1;
+
+				visibleRatios.forEach((ratio, hash) => {
+					if (ratio > selectedRatio) {
+						selectedHash = hash;
+						selectedRatio = ratio;
+					}
+				});
+
+				if (selectedHash) setActiveHash(selectedHash);
+			},
+			{
+				root: null,
+				threshold: [0.2, 0.35, 0.5, 0.7],
+				rootMargin: "-15% 0px -55% 0px",
 			}
-		});
+		);
 
-		aside.addEventListener("click", (event) => {
-			if (window.innerWidth > 640) return;
-			if ((event.target as HTMLElement).tagName.toLowerCase() === "a") {
+		sectionsByHash.forEach((section) => observer.observe(section));
+
+		document.addEventListener(
+			"click",
+			(event) => {
+				const targetLink = (event.target as HTMLElement).closest(".nav-link");
+				if (!(targetLink instanceof HTMLAnchorElement)) return;
+				if (new URL(targetLink.href).pathname !== window.location.pathname) return;
+				setActiveHash(targetLink.hash);
+			},
+			{ signal }
+		);
+
+		window.addEventListener(
+			"hashchange",
+			() => {
+				setActiveHash(window.location.hash || "#projects");
+			},
+			{ signal }
+		);
+
+		(window as Window & { __sectionNavCleanup?: () => void }).__sectionNavCleanup = () => {
+			controller.abort();
+			observer.disconnect();
+		};
+	};
+
+	const initScrollReveal = () => {
+		const previousCleanup = (window as Window & { __revealCleanup?: () => void }).__revealCleanup;
+		if (previousCleanup) previousCleanup();
+
+		const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+		if (!elements.length) return;
+
+		const controller = new AbortController();
+		const { signal } = controller;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					entry.target.classList.add("is-visible");
+					observer.unobserve(entry.target);
+				});
+			},
+			{
+				threshold: 0.2,
+				rootMargin: "0px 0px -8% 0px",
+			}
+		);
+
+		elements.forEach((element) => observer.observe(element));
+
+		const cleanup = () => {
+			controller.abort();
+			observer.disconnect();
+		};
+
+		window.addEventListener("beforeunload", cleanup, { signal });
+		(window as Window & { __revealCleanup?: () => void }).__revealCleanup = cleanup;
+	};
+
+	const initMobileMenu = () => {
+		const asideTarget = document.querySelector("#aside-target");
+		const aside = document.querySelector("#aside");
+		const main = document.querySelector("#main");
+		const closeAside = document.querySelector("#close-aside");
+
+		if (
+			!(asideTarget instanceof HTMLElement) ||
+			!(aside instanceof HTMLElement) ||
+			!(main instanceof HTMLElement) ||
+			!(closeAside instanceof HTMLElement)
+		) {
+			return;
+		}
+
+		const previousCleanup = (window as Window & { __menuCleanup?: () => void })
+			.__menuCleanup;
+		if (previousCleanup) previousCleanup();
+
+		const controller = new AbortController();
+		const { signal } = controller;
+
+		const isOpen = () => !aside.classList.contains("hidden");
+
+		const openAside = () => {
+			aside.classList.remove("hidden");
+			aside.classList.add("flex");
+			main.classList.add("blur-sm");
+		};
+
+		const closeAsideFn = () => {
+			aside.classList.add("hidden");
+			aside.classList.remove("flex");
+			main.classList.remove("blur-sm");
+		};
+
+		const toggleAside = () => {
+			if (isOpen()) {
+				closeAsideFn();
+				return;
+			}
+			openAside();
+		};
+
+		asideTarget.addEventListener(
+			"click",
+			(event) => {
+				event.stopPropagation();
 				toggleAside();
-			}
-		});
-	}
+			},
+			{ signal }
+		);
+
+		closeAside.addEventListener(
+			"click",
+			(event) => {
+				event.stopPropagation();
+				closeAsideFn();
+			},
+			{ signal }
+		);
+
+		document.addEventListener(
+			"click",
+			(event) => {
+				if (!event.target) return;
+				if (
+					!aside.contains(event.target as Node) &&
+					!asideTarget.contains(event.target as Node) &&
+					isOpen()
+				) {
+					closeAsideFn();
+				}
+			},
+			{ signal }
+		);
+
+		aside.addEventListener(
+			"click",
+			(event) => {
+				if (window.innerWidth >= MOBILE_BREAKPOINT) return;
+				if ((event.target as HTMLElement).closest("a")) {
+					closeAsideFn();
+				}
+			},
+			{ signal }
+		);
+
+		window.addEventListener(
+			"resize",
+			() => {
+				if (window.innerWidth >= MOBILE_BREAKPOINT) {
+					main.classList.remove("blur-sm");
+				}
+			},
+			{ signal }
+		);
+
+		(window as Window & { __menuCleanup?: () => void }).__menuCleanup = () => {
+			controller.abort();
+		};
+	};
+
+	document.addEventListener("astro:page-load", initMobileMenu);
+	document.addEventListener("astro:page-load", initSectionNavHighlight);
+	document.addEventListener("astro:page-load", initScrollReveal);
+	initMobileMenu();
+	initSectionNavHighlight();
+	initScrollReveal();
 </script>
 
 <style>
@@ -147,5 +349,8 @@ import { ClientRouter } from "astro:transitions";
 		color: white;
 		font-family: sans-serif;
 		scroll-behavior: smooth;
+		overflow-y: auto;
+		scroll-snap-type: y proximity;
+		scroll-padding-top: 6rem;
 	}
 </style>

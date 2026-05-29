@@ -12,17 +12,19 @@ import LinkedinIcon from "../icons/LinkedinIcon.astro";
             <picture>
                 <img src="/img/Perfil.webp" alt="Julio Monroy" class="rounded-full w-20 h-20 object-cover"/ >
             </picture>
-            <div>
-                <h1>Julio Monroy</h1>
-                <span class="text-xs text-slate-500">
-                    Programador Analitico
+            <div class="flex flex-col gap-1">
+                <h1 class="text-2xl sm:text-3xl font-bold leading-none tracking-tight text-slate-100">
+                    Julio Monroy
+                </h1>
+                <span class="text-sm text-slate-400 tracking-wide">
+                    Ingeniero Civil en Informática
                 </span>
             </div>
         </div>
-        <ul class="flex flex-col justify-center gap-2">
-            <SectionNav href="/#projects" title="Projectos" />
+        <ul class="flex flex-col justify-center gap-3">
+            <SectionNav href="/#projects" title="Proyectos" />
             <SectionNav href="/#experience" title="Experiencia" />
-            <SectionNav href="/#about" title="Sobre mi" />
+            <SectionNav href="/#about" title="Sobre mí" />
         </ul>
         <div class="flex content-between w-50 gap-5">
             <ItemRRSS href="https://github.com/Elcazuelas">
@@ -30,6 +32,7 @@ import LinkedinIcon from "../icons/LinkedinIcon.astro";
             </ItemRRSS>
             <ItemRRSS href="https://linkedin.com/in/julio-monroy">
                 <LinkedinIcon />
+            </ItemRRSS>
         </div>
     </div>
 </nav>

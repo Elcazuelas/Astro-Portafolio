@@ -8,26 +8,46 @@ import TimeLine from "../components/TimeLine.astro";
 ---
 
 <Layout>
-	<section id="projects" class="flex flex-col">
+	<section id="projects" data-reveal="section" class="snap-start flex flex-col justify-start pt-8 sm:pt-12 scroll-mt-24">
 		<TituloSection> Proyectos </TituloSection>
 		<ProyectCard />
 	</section>
-	<section id="experience" class="flex flex-col">
+	<section id="experience" data-reveal="section" class="snap-start flex flex-col justify-start pt-8 sm:pt-12 scroll-mt-24">
 		<TituloSection> Experiencia </TituloSection>
 		<TimeLine />
 	</section>
-	<section id="about" class="flex flex-col mb-25">
-		<TituloSection> Sobre mi </TituloSection>
-		<p class="text-base font-semibold text-gray-900 dark:text-white">
-			Hola! me llamo Julio Monroy 👋🏼
-		</p>
-		<p class="text-base font-normal text-gray-500 dark:text-gray-400">
-			Me gusta programar, y practicar deportes.
-			Soy Ingeniero Civil en Informática, mis objetivos son mejorar en la programación y
-			aportar con mi capacidad para resolver problemas en un equipo.
-			También me gusta aprender sobre patrones de diseño de software, robótica y tecnología en general. 💻
-
-		</p>
+	<section id="about" data-reveal="section" class="min-h-screen snap-start flex flex-col justify-start pt-8 sm:pt-12 scroll-mt-24">
+		<TituloSection> Sobre mí </TituloSection>
+		<div class="flex w-full flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/10 hover:shadow-2xl sm:p-6">
+			<p data-reveal="item" style="--reveal-delay: 0ms" class="text-base sm:text-lg font-semibold text-slate-100">
+				Soy Ingeniero Civil en Informática con experiencia en desarrollo de plataformas web,
+				análisis de datos, automatización de procesos y construcción de dashboards orientados a
+				la toma de decisiones.
+			</p>
+			<p data-reveal="item" style="--reveal-delay: 90ms" class="text-base font-normal text-slate-300 leading-relaxed">
+				Actualmente me desempeño en la Dirección General de Análisis Institucional (DGAI) de
+				la Universidad del Bío-Bío, participando en proyectos relacionados con inteligencia
+				institucional, procesamiento de información científica y visualización de indicadores
+				estratégicos.
+			</p>
+			<p data-reveal="item" style="--reveal-delay: 180ms" class="text-base font-normal text-slate-300 leading-relaxed">
+				Mi trabajo se enfoca principalmente en el desarrollo de soluciones tecnológicas que
+				integren análisis de datos, automatización y experiencia de usuario, utilizando
+				herramientas como Power BI, Python, WordPress, Node.js y PostgreSQL. Además, poseo
+				experiencia en procesamiento bibliométrico y automatización de metadatos científicos
+				mediante integración con APIs académicas y sistemas de información.
+			</p>
+			<p data-reveal="item" style="--reveal-delay: 270ms" class="text-base font-normal text-slate-300 leading-relaxed">
+				He participado tanto en proyectos institucionales como freelance, desarrollando
+				soluciones relacionadas con plataformas de indicadores, sistemas inteligentes de
+				gestión, automatización ETL y aplicaciones orientadas al área de salud.
+			</p>
+			<p data-reveal="item" style="--reveal-delay: 360ms" class="text-base font-normal text-slate-300 leading-relaxed">
+				Me interesa especialmente el desarrollo de sistemas que combinen visualización de datos,
+				inteligencia artificial y automatización, buscando generar herramientas escalables y
+				útiles para instituciones, organizaciones y usuarios finales.
+			</p>
+		</div>
 	</section>
 	<!-- <section id="contact" class="flex flex-col mb-20">
 		<TituloSection> Contacto </TituloSection>
